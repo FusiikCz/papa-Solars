@@ -67,6 +67,20 @@ def history(battery_id: int, hours: int = 24):
     return {"battery_id": battery_id, "hours": min(max(hours, 1), 168), "points": points}
 
 
+@app.get("/api/batteries/{battery_id}/cells/{cell_index}/history")
+def cell_history(battery_id: int, cell_index: int, hours: int = 24):
+    _require(battery_id)
+    if cell_index < 0 or cell_index > 149:
+        raise HTTPException(status_code=404, detail="článek je mimo mapu Force H2")
+    bounded = min(max(hours, 1), 168)
+    return {
+        "battery_id": battery_id,
+        "cell_index": cell_index,
+        "hours": bounded,
+        "points": hub().store.cell_history(battery_id, cell_index, since_hours(bounded)),
+    }
+
+
 @app.get("/api/batteries/{battery_id}/events")
 def events(battery_id: int, hours: int = 168):
     _require(battery_id)

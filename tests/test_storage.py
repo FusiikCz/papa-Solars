@@ -38,7 +38,10 @@ def test_sqlite_keeps_history_and_separates_outages(tmp_path):
         "mode": "charge",
         "quality_ok": True,
         "modules": [],
-        "cells": [],
+        "cells": [
+            {"index": 0, "module": 0, "cell": 0, "mv": 3300},
+            {"index": 1, "module": 0, "cell": 1, "mv": 3310},
+        ],
         "alarms": [{"level": "alarm", "text": "Výstraha: vysoké napětí článku"}],
         "notices": [],
         "quality_notes": [],
@@ -53,4 +56,7 @@ def test_sqlite_keeps_history_and_separates_outages(tmp_path):
     assert events[0]["online"] is False
     assert events[0]["error"] == "neodpověděl"
     assert store.last_success(row["id"]) == moment.replace(microsecond=0)
+    series = store.cell_history(row["id"], 1, moment - timedelta(minutes=5))
+    assert series == [{"t": series[0]["t"], "mv": 3310}]
+    assert store.cell_history(row["id"], 4, moment - timedelta(minutes=5)) == []
     store.close()

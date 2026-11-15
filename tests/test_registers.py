@@ -7,7 +7,7 @@ def write_ascii(regs: dict, start: int, count: int, text: str) -> None:
         regs[start + index] = (raw[index * 2] << 8) | raw[index * 2 + 1]
 
 
-def force_regs(**extra) -> dict:
+def force_regs(extra: dict | None = None) -> dict:
     regs = {
         0x1400: 1 << 11,
         0x1401: 0,
@@ -33,7 +33,8 @@ def force_regs(**extra) -> dict:
     write_ascii(regs, 0x1005, 5, "Force_H2")
     regs[0x100A] = 0x0200
     regs[0x100B] = (52 << 8) | 34
-    regs.update(extra)
+    if extra:
+        regs.update(extra)
     return regs
 
 
@@ -56,12 +57,12 @@ def test_decodes_force_h2_without_inventing_alarms():
 
 
 def test_bms_bit_is_the_alarm_not_a_homemade_threshold():
-    reading = decode(force_regs(**{0x1402: 1 << 14}))
+    reading = decode(force_regs({0x1402: 1 << 14}))
     assert reading["alarms"] == [{"level": "alarm", "text": "Výstraha: vysoké napětí článku"}]
 
 
 def test_implausible_soc_is_kept_and_marked():
-    reading = decode(force_regs(**{0x1407: 250}))
+    reading = decode(force_regs({0x1407: 250}))
     assert reading["soc"] == 250
     assert reading["quality_ok"] is False
     assert any("SOC" in note for note in reading["quality_notes"])

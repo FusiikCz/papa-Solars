@@ -109,22 +109,57 @@ h2 { margin: 0 0 12px; font-size: 18px; }
 .level-info, .notes li { background: #f6f1e8; }
 .notes { margin: 0; padding-left: 18px; }
 
-.modules, .cells { display: grid; gap: 12px; }
-.module-head { display: flex; justify-content: space-between; gap: 12px; }
+.pairs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px 18px;
+}
+.pairs span, .module-btn span, .cell small { display: block; color: var(--muted); font-size: 13px; }
+.pairs strong { display: block; margin-top: 2px; font-size: 20px; font-weight: 650; font-variant-numeric: tabular-nums; }
+
+.module-list { display: grid; gap: 8px; }
+.module-btn {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  text-align: left;
+  border: 1px solid var(--line);
+  background: #fffdf8;
+  border-radius: 12px;
+  padding: 12px 14px;
+  cursor: pointer;
+}
+.module-btn b { font-size: 18px; font-variant-numeric: tabular-nums; }
+.module-btn i { color: var(--accent); font-style: normal; }
+
+.back {
+  border: 0;
+  background: transparent;
+  color: var(--accent);
+  cursor: pointer;
+  padding: 0 0 8px;
+  font-weight: 650;
+}
+.cell-title { font-size: 42px; margin: 0; font-variant-numeric: tabular-nums; }
+
 .cell-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(52px, 1fr));
-  gap: 4px;
+  grid-template-columns: repeat(auto-fill, minmax(64px, 1fr));
+  gap: 6px;
 }
 .cell {
+  border: 1px solid transparent;
   border-radius: 8px;
-  min-height: 42px;
+  min-height: 48px;
   padding: 4px;
   text-align: center;
   font-size: 12px;
   font-variant-numeric: tabular-nums;
+  cursor: pointer;
 }
-.cell small { display: block; color: var(--muted); }
+.cell small { font-size: 11px; }
+.cell.marked { outline: 2px solid var(--accent); }
 
 .chart-wrap { overflow-x: auto; }
 svg.chart { width: 100%; height: auto; display: block; }

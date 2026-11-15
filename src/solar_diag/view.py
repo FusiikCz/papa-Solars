@@ -30,8 +30,6 @@ MEASUREMENT_KEYS = (
     "remaining_wh",
     "charged_today_wh",
     "discharged_today_wh",
-    "module_count",
-    "cell_count",
     "state_bits",
     "protection_bits",
     "alarm_bits",
@@ -51,6 +49,8 @@ def empty_battery(row: dict, error: str, last_success_at: datetime | None = None
         "model": row.get("model"),
         "firmware": row.get("firmware"),
         "bms_serial": row.get("bms_serial"),
+        "module_count": row.get("module_count"),
+        "cell_count": row.get("cell_count"),
         "communication_ok": False,
         "error": error,
         "measured_at": None,
@@ -76,6 +76,10 @@ def live_battery(row: dict, reading: dict, measured_at: datetime, last_success_a
     view["model"] = reading.get("model") or view["model"]
     view["firmware"] = reading.get("firmware") or view["firmware"]
     view["bms_serial"] = reading.get("bms_serial") or view["bms_serial"]
+    if reading.get("module_count") is not None:
+        view["module_count"] = reading.get("module_count")
+    if reading.get("cell_count") is not None:
+        view["cell_count"] = reading.get("cell_count")
     for key in MEASUREMENT_KEYS:
         if key in reading:
             view[key] = reading.get(key)

@@ -9,10 +9,12 @@ Program je jen na čtení. Do BMS nic nezapisuje. OpenVPN je cesta k téhle str�
 Na počítači, který má cestu do `192.168.99.0/24`:
 
 ```powershell
-py -m venv .venv
+py -3.13 -m venv .venv
 .\.venv\Scripts\python -m pip install -r requirements.txt
 .\.venv\Scripts\python run.py
 ```
+
+Na tomhle počítači je výchozí `py` free-threading build `3.13t`. Ten závislosti nenainstaluje, proto je v příkazu obyčejné `py -3.13`.
 
 Stránka je na [http://localhost:8080](http://localhost:8080). Historie je v `data/diag.db`.
 

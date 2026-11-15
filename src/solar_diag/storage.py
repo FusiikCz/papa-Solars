@@ -53,7 +53,15 @@ def load_ts(value) -> datetime | None:
         if value.tzinfo is None:
             return value.replace(tzinfo=timezone.utc)
         return value.astimezone(timezone.utc).replace(microsecond=0)
-    return datetime.strptime(str(value)[:19], "%Y-%m-%d %H:%M:%S").replace(tzinfo=timezone.utc)
+    text = str(value).strip()
+    if text.endswith("Z"):
+        text = text[:-1] + "+00:00"
+    if "T" in text:
+        parsed = datetime.fromisoformat(text)
+        if parsed.tzinfo is None:
+            parsed = parsed.replace(tzinfo=timezone.utc)
+        return parsed.astimezone(timezone.utc).replace(microsecond=0)
+    return datetime.strptime(text[:19], "%Y-%m-%d %H:%M:%S").replace(tzinfo=timezone.utc)
 
 
 def iso(value) -> str | None:
@@ -291,6 +299,30 @@ class Store:
                     "cell_delta_mv": row["cell_delta_mv"],
                 }
             )
+        return _stride(points, 800)
+
+    def cell_history(self, battery_id: int, cell_index: int, since: datetime) -> list[dict]:
+        rows = self._all(
+            """
+            SELECT ts, cells
+            FROM snapshots
+            WHERE battery_id = %s AND ts >= %s AND online = %s
+            ORDER BY ts
+            """,
+            (battery_id, dump_ts(since), True),
+        )
+        points = []
+        for row in rows:
+            cells = self._load_json(row["cells"]) or []
+            millivolts = None
+            if isinstance(cells, list):
+                for item in cells:
+                    if isinstance(item, dict) and item.get("index") == cell_index:
+                        millivolts = item.get("mv")
+                        break
+            if millivolts is None:
+                continue
+            points.append({"t": iso(row["ts"]), "mv": millivolts})
         return _stride(points, 800)
 
     def events(self, battery_id: int, since: datetime) -> list[dict]:
