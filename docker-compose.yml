@@ -1,0 +1,22 @@
+# PostgreSQL pro domácí server. Samotný sběr sem nedávejte do bridge sítě,
+# z té neuvidí 192.168.99.0/24. Na Linuxu přidejte docker-compose.server.yml.
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: solar
+      POSTGRES_PASSWORD: solar
+      POSTGRES_DB: solar
+    ports:
+      - "127.0.0.1:5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U solar -d solar"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+    restart: unless-stopped
+
+volumes:
+  pgdata:
